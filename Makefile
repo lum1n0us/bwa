@@ -1,9 +1,12 @@
-CC=			gcc
-#CC=			clang --analyze
-CFLAGS=		-g -Wall -Wno-unused-function -O2
+#CC=                    gcc
+CC=/usr/bin/clang-11 --target=wasm32-wasi --sysroot=/opt/wasi-sdk-11.0/share/wasi-sysroot -fuse-ld=/usr/bin/wasm-ld-11 -msimd128
+#CC=                   clang --analyze
+CFLAGS=                -g -Wall -Wno-unused-function -O2
+CFLAGS+=-Xlinker --allow-undefined -Xlinker --no-entry
+
 WRAP_MALLOC=-DUSE_MALLOC_WRAPPERS
 AR=			ar
-DFLAGS=		-DHAVE_PTHREAD $(WRAP_MALLOC)
+DFLAGS=-DHAVE_PTHREAD $(WRAP_MALLOC) -D__SSE__ -D__SSE2__ -D__SSE3__ -D__SSE41__ -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_SIGNAL
 LOBJS=		utils.o kthread.o kstring.o ksw.o bwt.o bntseq.o bwa.o bwamem.o bwamem_pair.o bwamem_extra.o malloc_wrap.o \
 			QSufSort.o bwt_gen.o rope.o rle.o is.o bwtindex.o
 AOBJS=		bwashm.o bwase.o bwaseqio.o bwtgap.o bwtaln.o bamlite.o \
@@ -11,7 +14,7 @@ AOBJS=		bwashm.o bwase.o bwaseqio.o bwtgap.o bwtaln.o bamlite.o \
 			bwtsw2_core.o bwtsw2_main.o bwtsw2_aux.o bwt_lite.o \
 			bwtsw2_chain.o fastmap.o bwtsw2_pair.o
 PROG=		bwa
-INCLUDES=	
+INCLUDES=-I${PWD}/deps/zlib-1.2.11 -I${PWD}/deps/pthread -I${PWD}/deps/SSE
 LIBS=		-lm -lz -lpthread
 SUBDIRS=	.
 
@@ -31,6 +34,9 @@ bwa:libbwa.a $(AOBJS) main.o
 
 bwamem-lite:libbwa.a example.o
 		$(CC) $(CFLAGS) $(DFLAGS) example.o -o $@ -L. -lbwa $(LIBS)
+
+bwa.wasm:$(LOBJS) $(AOBJS) main.o
+		$(CC) $(CFLAGS) $(DFLAGS) $(LOBJS) $(AOBJS) main.o -o $@
 
 libbwa.a:$(LOBJS)
 		$(AR) -csru $@ $(LOBJS)
