@@ -9,3 +9,8 @@
 we only use *wasi-sdk* to provide *sysroot* and *libclang_rt.builtins-wasm32.a*. Actually, you can download [wasi-sysroot-11.tar.gz](https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-11/wasi-sysroot-11.0.tar.gz) and [libclang_rt.builtins-wasm32.a](https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-11/libclang_rt.builtins-wasm32-wasi-11.0.tar.gz) separatelly.
 
 Instead of *wasi-sdk*, we are using *clang-11* as our compiler, using *wasm-ld-11* as our linker.
+
+## Deps
+[pthread](./deps/pthread) comes from emscripten
+[SSE](./deps/SSE) comes from emscripten
+[zlib](./deps/zlib-1.2.11) comes from  [zlib.net](http://www.zlib.net/)
