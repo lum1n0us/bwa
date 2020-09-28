@@ -4,7 +4,7 @@ if [[ ! -d build_scripts ]]; then
     mkdir build_scripts
 fi
 
-cd build_script
+cd build_scripts
 if [[ ! -f wasi-sdk-11.0-linux.tar.gz ]]; then
     wget https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-11/wasi-sdk-11.0-linux.tar.gz
 fi

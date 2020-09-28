@@ -2,7 +2,7 @@
 CC=/usr/bin/clang-11 --target=wasm32-wasi --sysroot=/opt/wasi-sdk-11.0/share/wasi-sysroot -fuse-ld=/usr/bin/wasm-ld-11 -msimd128
 #CC=                   clang --analyze
 CFLAGS=                -g -Wall -Wno-unused-function -O2
-CFLAGS+=-Xlinker --allow-undefined -Xlinker --no-entry
+CFLAGS+=-Xlinker --allow-undefined
 
 WRAP_MALLOC=-DUSE_MALLOC_WRAPPERS
 AR=			ar
@@ -37,6 +37,9 @@ bwamem-lite:libbwa.a example.o
 
 bwa.wasm:$(LOBJS) $(AOBJS) main.o
 		$(CC) $(CFLAGS) $(DFLAGS) $(LOBJS) $(AOBJS) main.o -o $@
+
+bwamem-lite.wasm:$(LOBJS) example.o
+		$(CC) $(CFLAGS) $(DFLAGS) $(LOBJS) example.o -o $@
 
 libbwa.a:$(LOBJS)
 		$(AR) -csru $@ $(LOBJS)
