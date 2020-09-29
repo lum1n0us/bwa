@@ -11,7 +11,7 @@ RUN apt update \
 
 # create links
 ENV CC=/usr/bin/clang-11 \
-    CXX=/usr/bin/clang-cpp-11
+    CXX=/usr/bin/clang++-11
 
 #
 # install wasi-sdk-11
