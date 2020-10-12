@@ -1,16 +1,10 @@
 ## Steps
 
-- setup your compiling environment in a docker. run [build.sh](./docker/build.sh) to download necessary files and to build a docker image
-- run the docker image with [run.sh](./docker/run.sh)
-- in the building container, cd /data where you will find bwa source code and compile bwa.wasm like `make bwa.wasm`
+- install EMCC. Please refer to [download ans install](https://emscripten.org/docs/getting_started/downloads.html)
+- clone [bwa](https://github.com/lh3/bwa) and compile bwa.wasm like `make bwa.wasm`
 
 
 ## Notes
-we only use *wasi-sdk* to provide *sysroot* and *libclang_rt.builtins-wasm32.a*. Actually, you can download [wasi-sysroot-11.tar.gz](https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-11/wasi-sysroot-11.0.tar.gz) and [libclang_rt.builtins-wasm32.a](https://github.com/WebAssembly/wasi-sdk/releases/download/wasi-sdk-11/libclang_rt.builtins-wasm32-wasi-11.0.tar.gz) separatelly.
 
-Instead of *wasi-sdk*, we are using *clang-11* as our compiler, using *wasm-ld-11* as our linker.
+After trying *wasi-sdk*, *clang-11* and *emcc*, we found *emcc* is a better **C/C++ to WebAssembly compiler** because of its libraries supporting.
 
-## Deps
-[pthread](./deps/pthread) comes from emscripten
-[SSE](./deps/SSE) comes from emscripten
-[zlib](./deps/zlib-1.2.11) comes from  [zlib.net](http://www.zlib.net/)

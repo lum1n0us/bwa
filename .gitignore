@@ -7,3 +7,4 @@ Makefile.bak
 bwamem-lite
 *.wasm
 *.wa[s]t
+docker

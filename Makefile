@@ -1,20 +1,26 @@
 #CC=                    gcc
-CC=/usr/bin/clang-11 --target=wasm32-wasi --sysroot=/opt/wasi-sdk-11.0/share/wasi-sysroot -fuse-ld=/usr/bin/wasm-ld-11 -msimd128
 #CC=                   clang --analyze
+CC=emcc
 CFLAGS=                -g -Wall -Wno-unused-function -O2
-CFLAGS+=-Xlinker --allow-undefined
+CFLAGS+=-msimd128 -msse -msse2 -msse3 -msse4.1
+CFLAGS+=-s STANDALONE_WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s USE_ZLIB=1#-v
+
+
+# with clang-11
+# /usr/bin/clang-11 --target=wasm32-wasi --sysroot=/opt/wasi-sdk-11.0/share/wasi-sysroot -fuse-ld=/usr/bin/wasm-ld-11 -msimd128
+
 
 WRAP_MALLOC=-DUSE_MALLOC_WRAPPERS
 AR=			ar
-DFLAGS=-DHAVE_PTHREAD $(WRAP_MALLOC) -D__SSE__ -D__SSE2__ -D__SSE3__ -D__SSE41__ -D_WASI_EMULATED_MMAN -D_WASI_EMULATED_SIGNAL
+DFLAGS=		-DHAVE_PTHREAD $(WRAP_MALLOC)
 LOBJS=		utils.o kthread.o kstring.o ksw.o bwt.o bntseq.o bwa.o bwamem.o bwamem_pair.o bwamem_extra.o malloc_wrap.o \
 			QSufSort.o bwt_gen.o rope.o rle.o is.o bwtindex.o
 AOBJS=		bwashm.o bwase.o bwaseqio.o bwtgap.o bwtaln.o bamlite.o \
 			bwape.o kopen.o pemerge.o maxk.o \
 			bwtsw2_core.o bwtsw2_main.o bwtsw2_aux.o bwt_lite.o \
 			bwtsw2_chain.o fastmap.o bwtsw2_pair.o
-PROG=		bwa
-INCLUDES=-I${PWD}/deps/zlib-1.2.11 -I${PWD}/deps/pthread -I${PWD}/deps/SSE
+PROG=		bwa.wasm
+INCLUDES=
 LIBS=		-lm -lz -lpthread
 SUBDIRS=	.
 
