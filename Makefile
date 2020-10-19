@@ -1,10 +1,10 @@
 #CC=                    gcc
 #CC=                   clang --analyze
-CC=emcc
+CC=/workspace/emsdk/upstream/emscripten/emcc
 CFLAGS=                -g -Wall -Wno-unused-function -O2
 CFLAGS+=-msimd128 -msse -msse2 -msse3 -msse4.1
-CFLAGS+=-s STANDALONE_WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s USE_ZLIB=1#-v
-
+CFLAGS+=-s EXPORTED_FUNCTIONS="['_main']"
+CFLAGS+=-s ERROR_ON_UNDEFINED_SYMBOLS=0 -s USE_ZLIB=1 -s TOTAL_MEMORY=268435456 -s USE_PTHREADS=0 -v
 
 # with clang-11
 # /usr/bin/clang-11 --target=wasm32-wasi --sysroot=/opt/wasi-sdk-11.0/share/wasi-sysroot -fuse-ld=/usr/bin/wasm-ld-11 -msimd128
@@ -12,14 +12,14 @@ CFLAGS+=-s STANDALONE_WASM=1 -s ERROR_ON_UNDEFINED_SYMBOLS=0 -s USE_ZLIB=1#-v
 
 WRAP_MALLOC=-DUSE_MALLOC_WRAPPERS
 AR=			ar
-DFLAGS=		-DHAVE_PTHREAD $(WRAP_MALLOC)
+DFLAGS=		$(WRAP_MALLOC) -DNDEBUG #-DHAVE_PTHREAD
 LOBJS=		utils.o kthread.o kstring.o ksw.o bwt.o bntseq.o bwa.o bwamem.o bwamem_pair.o bwamem_extra.o malloc_wrap.o \
 			QSufSort.o bwt_gen.o rope.o rle.o is.o bwtindex.o
 AOBJS=		bwashm.o bwase.o bwaseqio.o bwtgap.o bwtaln.o bamlite.o \
 			bwape.o kopen.o pemerge.o maxk.o \
 			bwtsw2_core.o bwtsw2_main.o bwtsw2_aux.o bwt_lite.o \
 			bwtsw2_chain.o fastmap.o bwtsw2_pair.o
-PROG=		bwa.wasm
+PROG=		bwa
 INCLUDES=
 LIBS=		-lm -lz -lpthread
 SUBDIRS=	.
@@ -41,17 +41,14 @@ bwa:libbwa.a $(AOBJS) main.o
 bwamem-lite:libbwa.a example.o
 		$(CC) $(CFLAGS) $(DFLAGS) example.o -o $@ -L. -lbwa $(LIBS)
 
-bwa.wasm:$(LOBJS) $(AOBJS) main.o
-		$(CC) $(CFLAGS) $(DFLAGS) $(LOBJS) $(AOBJS) main.o -o $@
-
-bwamem-lite.wasm:$(LOBJS) example.o
-		$(CC) $(CFLAGS) $(DFLAGS) $(LOBJS) example.o -o $@
+bwa.js:$(LOBJS) $(AOBJS) main.o
+		$(CC) $(DFLAGS) $(CFLAGS) $(LOBJS) $(AOBJS) main.o -o $@
 
 libbwa.a:$(LOBJS)
 		$(AR) -csru $@ $(LOBJS)
 
 clean:
-		rm -f gmon.out *.o a.out $(PROG) *~ *.a
+		rm -f gmon.out *.o a.out $(PROG) *~ *.a bwa.js bwa.wasm
 
 depend:
 	( LC_ALL=C ; export LC_ALL; makedepend -Y -- $(CFLAGS) $(DFLAGS) -- *.c )
